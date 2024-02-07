@@ -11,6 +11,16 @@
           ],
           "name": "Meine Einkaufsliste",
           "description": "Custom shopping list"
+        },
+        "en-EN": {
+          "summary": "Self-hosted shopping list",
+          "examplePhrases": [
+            "Alexa, open My Shopping List",
+            "hello",
+            "help"
+          ],
+          "name": "My Shopping List",
+          "description": "Custom shopping list"
         }
       },
       "isAvailableWorldwide": true,
