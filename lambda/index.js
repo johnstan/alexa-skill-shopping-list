@@ -22,7 +22,7 @@ const LaunchRequestHandler = {
   },
   handle(handlerInput) {
     wasOpened = true;
-    const speakOutput = 'Hier ist deine Einkaufsliste, was möchstest du tun?';
+    const speakOutput = 'Here is your shopping list, what would you like to do?';
     return handlerInput.responseBuilder
       .speak(speakOutput)
       .reprompt(speakOutput)
@@ -38,30 +38,25 @@ const AddItemIntentHandler = {
     );
   },
   async handle(handlerInput) {
-    // Response container
     let speakOutput;
 
-    // Get item name from request
     let item = Alexa.getSlotValue(handlerInput.requestEnvelope, 'item');
     item = item.charAt(0).toUpperCase() + item.slice(1); // Make first letter uppercase
 
     try {
-      // Add item to list
       await api.create(item);
-      speakOutput = `Ich habe ${item} hinzugefügt.`;
-      speakOutput += wasOpened ? ' Noch etwas?' : '';
+      speakOutput = `I have added ${item}.`;
+      speakOutput += wasOpened ? ' Anything else?' : '';
     } catch (err) {
-      speakOutput = 'Sorry, da ist etwas schief gelaufen';
+      speakOutput = 'Sorry, something went wrong.';
       console.error('Error adding item');
       console.error(err);
     }
 
-    // Prepare response builder
     let rb = handlerInput.responseBuilder.speak(speakOutput);
 
-    // Ask for more if opened
     if (wasOpened) {
-      rb = rb.reprompt('Noch etwas?');
+      rb = rb.reprompt('Anything else?');
     }
 
     return rb.getResponse();
@@ -76,47 +71,37 @@ const ListItemsIntentHandler = {
     );
   },
   async handle(handlerInput) {
-    // Fallback response
     let speakOutput;
 
     try {
-      // Get all items
       const items = await api.list();
       const totalItemsAmount = items.length;
 
-      const itemsToReportAmount =
-          totalItemsAmount < maxNoOfItemsReported
-              ? totalItemsAmount : maxNoOfItemsReported;
+      const itemsToReportAmount = totalItemsAmount < maxNoOfItemsReported ? totalItemsAmount : maxNoOfItemsReported;
       const itemsToReport = items.slice(0, itemsToReportAmount).map((item) => item.name);
 
-      // Output
       if (totalItemsAmount === 0) {
-        // List is empty
-        speakOutput = `Die Einkaufsliste ist leer.`;
+        speakOutput = `The shopping list is empty.`;
       } else if (totalItemsAmount === 1) {
-        // List has one item
-        speakOutput = `Es ist ein Artikel auf deiner Liste: ${itemsToReport[0]}`;
+        speakOutput = `There is one item on your list: ${itemsToReport[0]}`;
       } else {
-        const itemsListed = itemsToReport.slice(0, -1).join(', ') + ' und ' + itemsToReport.slice(-1);
+        const itemsListed = itemsToReport.slice(0, -1).join(', ') + ' and ' + itemsToReport.slice(-1);
         if (totalItemsAmount <= maxNoOfItemsReported) {
-          // List all items on the list (amount below maxNoOfItemsReported)
-          speakOutput = `Es sind ${totalItemsAmount} Artikel auf deiner Liste: ${itemsListed}`;
+          speakOutput = `There are ${totalItemsAmount} items on your list: ${itemsListed}`;
         } else {
-          // More items than maxNoOfItemsReported are on the list. Change text and only list the last x ones.
-          speakOutput = `Es sind ${totalItemsAmount} Artikel auf deiner Liste. Die letzten ${itemsToReportAmount} sind: ${itemsListed}`;
+          speakOutput = `There are ${totalItemsAmount} items on your list. The last ${itemsToReportAmount} are: ${itemsListed}`;
         }
       }
       
     } catch (err) {
-      speakOutput = 'Sorry, da ist etwas schief gelaufen';
+      speakOutput = 'Sorry, something went wrong.';
       console.error(err);
     }
 
     let rb = handlerInput.responseBuilder.speak(speakOutput);
 
-    // Ask for more if opened
     if (wasOpened) {
-      rb = rb.reprompt('Noch etwas?');
+      rb = rb.reprompt('Anything else?');
     }
 
     return rb.getResponse();
@@ -127,30 +112,25 @@ const ClearCompletedItemsIntentHandler = {
   canHandle(handlerInput) {
     return (
       Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
-      Alexa.getIntentName(handlerInput.requestEnvelope) ===
-        'ClearCompletedItemsIntent'
+      Alexa.getIntentName(handlerInput.requestEnvelope) === 'ClearCompletedItemsIntent'
     );
   },
   async handle(handlerInput) {
-    // Response container
     let speakOutput;
 
     try {
-      // Add item to list
       await api.clear();
-      speakOutput = 'Liste aufgeräumt';
+      speakOutput = 'List cleared';
     } catch (err) {
-      speakOutput = 'Sorry, da ist etwas schief gelaufen';
+      speakOutput = 'Sorry, something went wrong.';
       console.error('Error clearing list');
       console.error(err);
     }
 
-    // Prepare response builder
     let rb = handlerInput.responseBuilder.speak(speakOutput);
 
-    // Ask for more if opened
     if (wasOpened) {
-      rb = rb.reprompt('Noch etwas?');
+      rb = rb.reprompt('Anything else?');
     }
 
     return rb.getResponse();
@@ -166,7 +146,7 @@ const HelpIntentHandler = {
   },
   handle(handlerInput) {
     const speakOutput =
-      'Aktuell kann ich dir leider noch nicht helfen. Tut mir Leid.';
+      'I can\'t help with that at the moment, sorry.';
 
     return handlerInput.responseBuilder
       .speak(speakOutput)
@@ -179,15 +159,13 @@ const CancelAndStopIntentHandler = {
   canHandle(handlerInput) {
     return (
       Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
-      (Alexa.getIntentName(handlerInput.requestEnvelope) ===
-        'AMAZON.CancelIntent' ||
-        Alexa.getIntentName(handlerInput.requestEnvelope) ===
-          'AMAZON.StopIntent' ||
-        Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.NoIntent')
+      (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.CancelIntent' ||
+       Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StopIntent' ||
+       Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.NoIntent')
     );
   },
   handle(handlerInput) {
-    const speakOutput = 'Bis bald!';
+    const speakOutput = 'See you later!';
     return handlerInput.responseBuilder.speak(speakOutput).getResponse();
   },
 };
@@ -195,21 +173,15 @@ const CancelAndStopIntentHandler = {
 const SessionEndedRequestHandler = {
   canHandle(handlerInput) {
     return (
-      Alexa.getRequestType(handlerInput.requestEnvelope) ===
-      'SessionEndedRequest'
+      Alexa.getRequestType(handlerInput.requestEnvelope) === 'SessionEndedRequest'
     );
   },
   handle(handlerInput) {
-    // Any cleanup logic goes here.
     wasOpened = false;
     return handlerInput.responseBuilder.getResponse();
   },
 };
 
-// The intent reflector is used for interaction model testing and debugging.
-// It will simply repeat the intent the user said. You can create custom handlers
-// for your intents by defining them above, then also adding them to the request
-// handler chain below.
 const IntentReflectorHandler = {
   canHandle(handlerInput) {
     return (
@@ -223,15 +195,11 @@ const IntentReflectorHandler = {
     return (
       handlerInput.responseBuilder
         .speak(speakOutput)
-        //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
         .getResponse()
     );
   },
 };
 
-// Generic error handling to capture any syntax or routing errors. If you receive an error
-// stating the request handler chain is not found, you have not implemented a handler for
-// the intent being invoked or included it in the skill builder below.
 const ErrorHandler = {
   canHandle() {
     return true;
@@ -247,9 +215,6 @@ const ErrorHandler = {
   },
 };
 
-// The SkillBuilder acts as the entry point for your skill, routing all request and response
-// payloads to the handlers above. Make sure any new handlers or interceptors you've
-// defined are included below. The order matters - they're processed top to bottom.
 exports.handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
