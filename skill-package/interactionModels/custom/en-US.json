@@ -1,0 +1,62 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "my shopping list",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NoIntent",
+          "samples": []
+        },
+        {
+          "name": "AddItemIntent",
+          "slots": [
+            {
+              "name": "item",
+              "type": "AMAZON.Food"
+            }
+          ],
+          "samples": [
+            "{item}",
+            "add {item}",
+            "add {item} to the list",
+            "put {item} on my shopping list",
+            "set {item} on my shopping list"
+          ]
+        },
+        {
+          "name": "ListItemsIntent",
+          "samples": [
+            "what's on the list",
+            "what's on my list"
+          ]
+        },
+        {
+          "name": "ClearCompletedItemsIntent",
+          "samples": [
+            "delete all finished",
+            "delete all completed",
+            "clean up the list",
+            "tidy up the list"
+          ]
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        }
+      ],
+      "types": []
+    }
+  }
+}

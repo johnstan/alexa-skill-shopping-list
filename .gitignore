@@ -6,3 +6,5 @@ skill-package/skill.json
 .ask
 .env
 .idea
+skill-package/skill.sample.json
+lambda/.env.sample
